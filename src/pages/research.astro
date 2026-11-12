@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+import { interests, publications } from '../data/research';
+
+const byYear = [...publications].sort((a, b) => b.year - a.year);
+---
+
+<Base title="Research" description="Research interests and publications">
+  <header class="page-head">
+    <span class="eyebrow"><span class="dot"></span> Research</span>
+    <h1 class="gradient-text">What I'm curious about</h1>
+    <p class="lede">
+      A short overview of your research focus: the big question that ties your work together.
+    </p>
+  </header>
+
+  <p class="section-label">Interests</p>
+  <div class="interests">
+    {interests.map((i, n) => (
+      <article class="card">
+        <span class="num">{String(n + 1).padStart(2, '0')}</span>
+        <h3>{i.title}</h3>
+        <p>{i.summary}</p>
+      </article>
+    ))}
+  </div>
+
+  {byYear.length > 0 && (
+    <>
+      <p class="section-label">Publications</p>
+      <ol class="pubs">
+        {byYear.map((p) => (
+          <li>
+            <span class="year muted">{p.year}</span>
+            <div>
+              <span class="pub-title">{p.title}</span>
+              <span class="muted authors">{p.authors}</span>
+              <span class="pub-meta">
+                <em>{p.venue}</em>
+                {p.links?.map((l) => <a class="pill" href={l.href}>{l.label}</a>)}
+              </span>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </>
+  )}
+</Base>
+
+<style>
+  .page-head { padding-top: 3.5rem; }
+  .page-head h1 { margin-top: 1.25rem; }
+  .lede { font-size: 1.125rem; max-width: 36rem; }
+  .interests { display: grid; gap: 0.75rem; }
+  .num {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0.4rem;
+  }
+  .card p { font-size: 0.9375rem; }
+  .pubs { list-style: none; padding: 0; margin: 0; }
+  .pubs li {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    gap: 0.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--border);
+  }
+  .year { font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+  .pubs li > div > span { display: block; }
+  .pub-title { color: var(--text); font-weight: 500; }
+  .authors { font-size: 0.875rem; }
+  .pub-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+    font-size: 0.8125rem;
+  }
+  .pill {
+    padding: 0.1rem 0.55rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    text-decoration: none !important;
+  }
+</style>

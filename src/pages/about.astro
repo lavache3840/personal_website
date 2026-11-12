@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../consts';
+---
+
+<Base title="About" description={`About ${SITE.name}`}>
+  <header class="page-head">
+    <span class="eyebrow"><span class="dot"></span> About</span>
+    <h1 class="gradient-text">About me</h1>
+  </header>
+
+  <div class="intro">
+    <!-- Add a headshot at public/images/headshot.jpg and uncomment:
+    <img src="/images/headshot.jpg" alt={SITE.name} width="160" height="160" class="headshot" />
+    -->
+    <div>
+      <p>
+        <strong>Placeholder bio.</strong> I'm {SITE.name}. Write two or three sentences here about who
+        you are, what you do, and where you are based or affiliated.
+      </p>
+      <p>
+        Add a paragraph on your background: education, past roles, and the path that led you to
+        your current interests.
+      </p>
+    </div>
+  </div>
+
+  <p class="section-label">Currently</p>
+  <ul class="card now">
+    <li>What you're working on now</li>
+    <li>What you're reading or learning</li>
+  </ul>
+
+  <p class="section-label">Get in touch</p>
+  <p>
+    The best way to reach me is by email at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    <!-- Add a link to your CV once it's in public/: <a href="/cv.pdf">Download my CV</a> -->
+  </p>
+</Base>
+
+<style>
+  .page-head { padding-top: 3.5rem; }
+  .page-head h1 { margin-top: 1.25rem; }
+  .intro p { font-size: 1.0625rem; }
+  .now { list-style: none; margin: 0; }
+  .now li { padding: 0.35rem 0; }
+  .now li + li { border-top: 1px solid var(--border); }
+  .headshot { border: 1px solid var(--border-strong); }
+  .intro { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-start; }
+  .intro > div { flex: 1 1 18rem; }
+  .headshot { border-radius: 50%; object-fit: cover; }
+</style>

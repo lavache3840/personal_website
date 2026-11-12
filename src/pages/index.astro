@@ -1,0 +1,110 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../consts';
+import { getCollection } from 'astro:content';
+import { interests } from '../data/research';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+---
+
+<Base>
+  <section class="hero">
+    <div class="glow" aria-hidden="true"></div>
+    <span class="eyebrow"><span class="dot"></span> Writing &amp; research</span>
+    <h1 class="gradient-text">Hi, I'm {SITE.name.split(' ')[0]}.</h1>
+    <p class="lede">{SITE.tagline}</p>
+    <p class="intro">
+      This is where I write, share what I'm working on, and keep track of the research questions
+      that interest me.
+    </p>
+    <div class="actions">
+      <a class="btn btn-primary" href="/blog/">Read the blog</a>
+      <a class="btn" href="/research/">Research interests →</a>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <p class="section-label">Recent writing</p>
+      <a class="see-all" href="/blog/">All posts →</a>
+    </div>
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`} class="post-row">
+            <span class="post-title">{post.data.title}</span>
+            <time class="muted" datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section>
+    <p class="section-label">Research interests</p>
+    <div class="grid">
+      {interests.map((i) => (
+        <a href="/research/" class="card interest">
+          <h3>{i.title}</h3>
+          <p class="muted">{i.summary}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { position: relative; padding: 4.5rem 0 1rem; }
+  .glow {
+    position: absolute;
+    inset: -6rem -40% auto;
+    height: 26rem;
+    background: radial-gradient(ellipse 50% 60% at 50% 30%, var(--glow), transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    margin: 1.25rem 0 0.75rem;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+  .lede { font-size: 1.25rem; color: var(--text); margin: 0 0 0.75rem; letter-spacing: -0.01em; }
+  .intro { max-width: 34rem; margin: 0; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; }
+  .see-all { font-size: 0.8125rem; color: var(--muted); }
+
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .post-list li + li { border-top: 1px solid var(--border); }
+  .post-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    padding: 0.9rem 1.25rem;
+    background: var(--surface);
+    transition: background 0.15s ease;
+  }
+  .post-row:hover { background: var(--surface-hover); color: var(--text); }
+  .post-title { color: var(--text); font-weight: 500; }
+  .post-row time { font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+
+  .grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+  .interest p { font-size: 0.9rem; line-height: 1.55; }
+  .interest:hover h3 { color: var(--text); }
+</style>
