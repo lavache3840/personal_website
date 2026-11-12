@@ -40,9 +40,11 @@ Post body in Markdown.
 
 ## Deploying (GitHub Pages)
 
-1. Create a GitHub repo and push this project to `main`.
-2. In the repo: **Settings → Pages → Source: GitHub Actions**.
-3. Every push to `main` builds and deploys via `.github/workflows/deploy.yml`.
+Publishing is **manual**: pushing to `main` does not publish anything.
+
+1. One-time setup: in the repo, **Settings → Pages → Source: GitHub Actions**.
+2. To publish: **Actions → Publish site → Run workflow** (branch: `main`).
+   This builds whatever is on `main` and deploys it via `.github/workflows/deploy.yml`.
 
 ### Custom domain
 

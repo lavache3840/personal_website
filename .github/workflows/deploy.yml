@@ -1,8 +1,8 @@
-name: Deploy to GitHub Pages
+name: Publish site
 
+# Manual only: nothing deploys on push.
+# To publish: GitHub → Actions → "Publish site" → Run workflow.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -16,6 +16,8 @@ concurrency:
 
 jobs:
   build:
+    # Only publish from main, even if another branch is picked in the Run workflow menu.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
