@@ -1,6 +1,6 @@
 # Personal website
 
-Personal blog, about page, and research interests. Built with [Astro](https://astro.build) and deployed to GitHub Pages.
+The Rambling Somnambulist: a personal blog, about page, and interests. Built with [Astro](https://astro.build) and deployed to GitHub Pages.
 
 ## Run locally
 
@@ -14,9 +14,9 @@ npm run build    # production build into dist/
 
 | What | File |
 | --- | --- |
-| Name, tagline, email, social links | `src/consts.ts` |
+| Site name, tagline, email, social links, your real name (About page only) | `src/consts.ts` |
 | About page | `src/pages/about.astro` |
-| Research interests and publications | `src/data/research.ts` |
+| Interests | `src/data/interests.ts` |
 | Blog posts | `src/content/blog/*.md` (filename = URL) |
 | Colors and fonts | `src/styles/global.css` |
 | Images, CV, other files | `public/` (served from `/`) |
@@ -31,7 +31,7 @@ Create `src/content/blog/my-post.md`:
 title: 'My post'
 description: 'One-sentence summary.'
 pubDate: 2026-11-12
-tags: ['research']
+tags: ['notes']
 draft: false
 ---
 

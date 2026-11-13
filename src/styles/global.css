@@ -1,7 +1,7 @@
 /*
   Design system: dark-first, inspired by modern product sites like linear.app.
   Near-black canvas, Inter throughout, hairline borders, soft gradient text,
-  a single indigo accent, and a faint glow behind the hero.
+  a single blue accent, and a faint glow behind the hero.
 */
 
 :root {
@@ -15,10 +15,10 @@
   --text: #f7f8f8;
   --text-secondary: #b4bcd0;
   --muted: #8a8f98;
-  --accent: #7c85f2;
-  --accent-strong: #5e6ad2;
-  --accent-soft: rgba(94, 106, 210, 0.14);
-  --glow: rgba(94, 106, 210, 0.22);
+  --accent: #86b9ff;
+  --accent-strong: #639df8;
+  --accent-soft: rgba(99, 157, 248, 0.14);
+  --glow: rgba(99, 157, 248, 0.24);
   --heading-gradient: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.62) 100%);
   --shadow: 0 0 0 1px var(--border), 0 8px 24px rgba(0, 0, 0, 0.35);
   --header-bg: rgba(8, 9, 10, 0.72);
@@ -42,10 +42,10 @@
     --text: #0f1011;
     --text-secondary: #3c4149;
     --muted: #6b6f76;
-    --accent: #5e6ad2;
-    --accent-strong: #4c57c4;
-    --accent-soft: rgba(94, 106, 210, 0.1);
-    --glow: rgba(94, 106, 210, 0.12);
+    --accent: #5793ec;
+    --accent-strong: #5387dc;
+    --accent-soft: rgba(87, 147, 236, 0.1);
+    --glow: rgba(99, 157, 248, 0.14);
     --heading-gradient: linear-gradient(180deg, #0f1011 0%, rgba(15, 16, 17, 0.7) 100%);
     --shadow: 0 0 0 1px var(--border), 0 6px 18px rgba(15, 16, 17, 0.06);
     --header-bg: rgba(252, 252, 253, 0.78);
@@ -55,7 +55,8 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+/* overflow-x: clip stops the hero glow (which extends past the column) from causing sideways scroll. */
+html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
 
 body {
   margin: 0;
@@ -154,12 +155,27 @@ blockquote {
   border-radius: 999px;
   background: var(--surface);
 }
-.eyebrow .dot {
+.dot {
+  flex: none;
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 8px var(--accent);
+}
+/* Each page's pill gets its own dot color: Home green, About amber, Interests pink, Blog violet, Resume teal. */
+.dot[class*='dot-'] { background: var(--dot); box-shadow: 0 0 8px var(--dot); }
+.dot-green  { --dot: #3fd18b; }
+.dot-amber  { --dot: #f5b84a; }
+.dot-pink   { --dot: #f472b6; }
+.dot-violet { --dot: #a78bfa; }
+.dot-teal   { --dot: #2dd4bf; }
+@media (prefers-color-scheme: light) {
+  .dot-green  { --dot: #16a35f; }
+  .dot-amber  { --dot: #d38a0b; }
+  .dot-pink   { --dot: #db2777; }
+  .dot-violet { --dot: #7c3aed; }
+  .dot-teal   { --dot: #0d9488; }
 }
 
 .card {

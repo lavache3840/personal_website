@@ -2,60 +2,100 @@
 import Base from '../layouts/Base.astro';
 import { SITE } from '../consts';
 import { getCollection } from 'astro:content';
-import { interests } from '../data/research';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// The newest post is featured on its own; the next three appear as Recent Posts cards.
+const [latest, ...rest] = posts;
+const recent = rest.slice(0, 3);
+
+// Temporary landing page: shown automatically until the first post is published
+// (any post without draft: true). No need to switch anything by hand.
+const comingSoon = posts.length === 0;
 
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
 ---
 
-<Base>
+<Base standalone={comingSoon}>
   <section class="hero">
     <div class="glow" aria-hidden="true"></div>
-    <span class="eyebrow"><span class="dot"></span> Writing &amp; research</span>
-    <h1 class="gradient-text">Hi, I'm {SITE.name.split(' ')[0]}.</h1>
+    {comingSoon ? (
+      <span class="eyebrow"><span class="dot dot-green pulse"></span> Coming soon</span>
+    ) : (
+      <span class="eyebrow"><span class="dot dot-green"></span> Home</span>
+    )}
+    <h1 class="gradient-text">The Rambling Somnambulist</h1>
     <p class="lede">{SITE.tagline}</p>
-    <p class="intro">
-      This is where I write, share what I'm working on, and keep track of the research questions
-      that interest me.
-    </p>
-    <div class="actions">
-      <a class="btn btn-primary" href="/blog/">Read the blog</a>
-      <a class="btn" href="/research/">Research interests →</a>
-    </div>
+    {comingSoon ? (
+      <p class="intro">
+        Welcome to my corner of the internet. The first post is still being written, somewhere between midnight and morning. It will be about whatever has my attention: half-formed ideas, things I'm learning, and the occasional late-night tangent.
+      </p>
+    ) : (
+      <p class="intro">
+        Welcome to my corner of the internet. I write about whatever has my attention: half-formed ideas, things I'm learning, and the occasional late-night tangent.
+      </p>
+    )}
+    {!comingSoon && (
+      <div class="actions">
+        <a class="btn btn-primary" href="/blog/">Read the blog</a>
+        <a class="btn" href="/interests/">Interests →</a>
+      </div>
+    )}
   </section>
 
-  <section>
-    <div class="section-head">
-      <p class="section-label">Recent writing</p>
-      <a class="see-all" href="/blog/">All posts →</a>
-    </div>
-    <ul class="post-list">
-      {posts.map((post) => (
-        <li>
-          <a href={`/blog/${post.id}/`} class="post-row">
-            <span class="post-title">{post.data.title}</span>
-            <time class="muted" datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
-          </a>
-        </li>
-      ))}
-    </ul>
-  </section>
+  {comingSoon && (
+    <section>
+      <p class="section-label">Up next</p>
+      <div class="card featured soon">
+        <span class="soon-status"><span class="ink"></span> In progress</span>
+        <h2>The first ramble is on its way</h2>
+        <p class="muted">
+          Pen to paper, slowly. Check back soon.
+        </p>
+      </div>
+    </section>
+  )}
 
-  <section>
-    <p class="section-label">Research interests</p>
-    <div class="grid">
-      {interests.map((i) => (
-        <a href="/research/" class="card interest">
-          <h3>{i.title}</h3>
-          <p class="muted">{i.summary}</p>
-        </a>
-      ))}
-    </div>
-  </section>
+  {latest && (
+    <section>
+      <p class="section-label">Latest</p>
+      <a href={`/blog/${latest.id}/`} class="card featured">
+        <time class="muted" datetime={latest.data.pubDate.toISOString()}>{fmt(latest.data.pubDate)}</time>
+        <h2>{latest.data.title}</h2>
+        <p class="muted">{latest.data.description}</p>
+        {latest.data.tags.length > 0 && (
+          <span class="tags">{latest.data.tags.map((t) => <span class="tag">{t}</span>)}</span>
+        )}
+        <span class="read">Read →</span>
+      </a>
+    </section>
+  )}
+
+  {recent.length > 0 && (
+    <>
+      <hr class="divider" />
+      <section>
+        <div class="section-head">
+          <p class="section-label">Recent Posts</p>
+          <a class="see-all" href="/blog/">All posts →</a>
+        </div>
+        <ul class="post-cards">
+          {recent.map((post) => (
+            <li>
+              <a href={`/blog/${post.id}/`} class="card post-card">
+                <time class="muted" datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
+                <h3>{post.data.title}</h3>
+                <p class="muted">{post.data.description}</p>
+                <span class="read">Read →</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
+  )}
 </Base>
 
 <style>
@@ -69,42 +109,101 @@ const fmt = (d: Date) =>
     z-index: -1;
   }
   .hero h1 {
-    font-size: clamp(2.5rem, 8vw, 4rem);
+    /* Sized so the headline fits on one line, from phones up to the full 46rem column. */
+    font-size: clamp(1.5rem, 7.4vw - 0.15rem, 3.25rem);
     margin: 1.25rem 0 0.75rem;
     letter-spacing: -0.04em;
     line-height: 1.05;
   }
-  .lede { font-size: 1.25rem; color: var(--text); margin: 0 0 0.75rem; letter-spacing: -0.01em; }
+  .lede { font-size: clamp(1rem, 4vw, 1.25rem); color: var(--text); margin: 0 0 0.75rem; letter-spacing: -0.01em; }
   .intro { max-width: 34rem; margin: 0; }
   .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
 
   .section-head { display: flex; align-items: baseline; justify-content: space-between; }
   .see-all { font-size: 0.8125rem; color: var(--muted); }
 
-  .post-list {
+  /* Latest post: one wide featured card. */
+  .featured { display: flex; flex-direction: column; gap: 0.5rem; padding: 1.5rem 1.75rem; }
+  .featured time { font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+  .featured h2 { margin: 0; font-size: 1.5rem; letter-spacing: -0.02em; }
+  .featured p { font-size: 1rem; max-width: 36rem; }
+  .featured .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.25rem; }
+  .featured .tag {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+  }
+  .featured .read { padding-top: 0.75rem; }
+  .featured:hover .read { color: var(--accent); }
+
+  /* Temporary landing page */
+  .pulse { animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: 0.35; box-shadow: 0 0 2px var(--dot); } }
+  .soon { gap: 0.6rem; }
+  .hero + section .section-label { margin-top: 2.5rem; }
+  .soon:hover { background: var(--surface); border-color: var(--border); }
+  .soon-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+  /* A short "ink line" that slowly draws itself, like a pen writing. */
+  .ink {
+    width: 1.5rem;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent-strong), var(--accent));
+    transform-origin: left;
+    animation: ink 2.8s ease-in-out infinite;
+  }
+  @keyframes ink { 0% { transform: scaleX(0.1); } 60%, 100% { transform: scaleX(1); opacity: 0.4; } }
+  @media (prefers-reduced-motion: reduce) { .pulse, .ink { animation: none; } }
+
+  /* Line separating the latest post from Recent Posts. */
+  .divider { margin: 3rem 0 0; border-top-color: var(--border-strong); }
+  .divider + section .section-label { margin-top: 2rem; }
+
+  /* Recent posts: three cards side by side; on narrow screens they become a swipeable row. */
+  .post-cards {
     list-style: none;
     padding: 0;
     margin: 0;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .post-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0.4rem;
+  }
+  .post-card time { font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+  .post-card h3 { margin: 0; font-size: 1rem; line-height: 1.3; }
+  .post-card p {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .post-list li + li { border-top: 1px solid var(--border); }
-  .post-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0.25rem 1rem;
-    padding: 0.9rem 1.25rem;
-    background: var(--surface);
-    transition: background 0.15s ease;
-  }
-  .post-row:hover { background: var(--surface-hover); color: var(--text); }
-  .post-title { color: var(--text); font-weight: 500; }
-  .post-row time { font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+  .read { margin-top: auto; padding-top: 0.5rem; font-size: 0.8125rem; color: var(--muted); }
+  .post-card:hover .read { color: var(--accent); }
 
-  .grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
-  .interest p { font-size: 0.9rem; line-height: 1.55; }
-  .interest:hover h3 { color: var(--text); }
+  @media (max-width: 640px) {
+    .post-cards {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 78%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 0.5rem;
+    }
+    .post-cards li { scroll-snap-align: start; }
+  }
 </style>

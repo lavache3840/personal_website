@@ -1,8 +1,9 @@
 ---
 title: 'Hello, world'
-description: 'Why I started this site and what I plan to write about.'
+description: 'Why I started rambling on the internet, and what to expect.'
 pubDate: 2026-11-12
 tags: ['meta']
+draft: true
 ---
 
 Welcome to my new site. This is a placeholder first post. Replace it with your own.
@@ -11,9 +12,9 @@ Welcome to my new site. This is a placeholder first post. Replace it with your o
 
 I plan to write about:
 
-- My research and the questions that interest me
-- Papers and books I'm reading
-- Notes on things I'm learning
+- Ideas I can't stop turning over
+- Books, articles, and things I've stumbled onto
+- Notes on whatever I'm learning or tinkering with
 
 ## Writing a new post
 

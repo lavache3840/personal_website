@@ -1,0 +1,37 @@
+---
+// The site's mark: a sharply drawn fountain pen, nib down to the lower left.
+// Solid filled shapes (no rounded strokes) on a 24×24 grid with currentColor,
+// so it takes the color of its container.
+interface Props {
+  size?: number;
+}
+const { size = 18 } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="currentColor"
+  shape-rendering="geometricPrecision"
+  aria-hidden="true"
+>
+  <!-- Drawn upright (nib pointing down), then turned 45°. -->
+  <g transform="translate(12 12) rotate(45) scale(0.92)">
+    <!-- Cap with chamfered top -->
+    <path d="M-2.5 -13.6 L-1.4 -15 H1.4 L2.5 -13.6 V-4.6 H-2.5 Z" />
+    <!-- Clip, standing just proud of the cap -->
+    <path d="M2.5 -14.2 H3.5 V-7.6 L2.9 -6.6 H2.5 Z" />
+    <!-- Barrel, separated from the cap by a thin band gap -->
+    <path d="M-2.5 -3.5 H2.5 V1.2 H-2.5 Z" />
+    <!-- Grip section, tapering toward the nib -->
+    <path d="M-2.1 2.2 H2.1 L1.7 5.2 H-1.7 Z" />
+    <!-- Nib: pointed tip with a breather hole and slit cut out -->
+    <path
+      fill-rule="evenodd"
+      d="M-2.2 6.1 H2.2 L2.5 8.8 Q2.1 11.9 0 15.2 Q-2.1 11.9 -2.5 8.8 Z
+         M0 8.5 a0.75 0.75 0 1 0 0.001 0 Z
+         M-0.26 10 H0.26 V14 H-0.26 Z"
+    />
+  </g>
+</svg>

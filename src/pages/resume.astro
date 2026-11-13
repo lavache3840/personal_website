@@ -1,0 +1,371 @@
+---
+// Resume page. Reachable at /resume/ but intentionally not listed in the top tabs (NAV in consts.ts).
+// Layout: two columns. Main column = experience; sidebar = education, contact, skills.
+import fs from 'node:fs';
+import path from 'node:path';
+import Base from '../layouts/Base.astro';
+import { AUTHOR, SOCIAL } from '../consts';
+import { DRAFT, summary, experience, education, skills, email } from '../data/resume';
+
+// "PDF Resume" button: opens the uploaded file at public/resume.pdf (served as /resume.pdf).
+// The button only appears once that file exists, so there's never a broken link.
+const PDF_PATH = '/resume.pdf';
+const hasPdf = fs.existsSync(path.join(process.cwd(), 'public', 'resume.pdf'));
+
+// Contact: email address (from data/resume.ts) and a LinkedIn logo.
+const linkedin = SOCIAL.linkedin;
+const linkedinShort = linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+---
+
+<Base title="Resume" description={`Resume of ${AUTHOR.name}`}>
+  <header class="page-head">
+    <div class="glow" aria-hidden="true"></div>
+    <span class="eyebrow"><span class="dot dot-teal"></span> Resume</span>
+    <h1 class="gradient-text">{AUTHOR.name}</h1>
+    <p class="lede">{summary}</p>
+    {DRAFT && (
+      <p class="draft-note">
+        Draft: roles and dates come from public profiles and haven't been checked yet.
+      </p>
+    )}
+  </header>
+
+  <div class="resume">
+    <section class="main sec-teal">
+      <p class="section-label">Experience</p>
+      <ol class="roles">
+        {experience.map((r, i) => (
+          <li class={i === 0 ? 'latest' : undefined}>
+            <div class="role-head">
+              <h3>{r.title}</h3>
+              <span class="when">{r.start} – {r.end}</span>
+            </div>
+            <p class="org">
+              <span class="logo" style={r.logoBg ? `background:${r.logoBg}` : undefined} aria-hidden="true">
+                {r.logo
+                  ? <img src={r.logo} alt="" width="14" height="14" loading="lazy" />
+                  : <span class="logo-text">{r.logoText ?? r.org.split(/\s+/).map((w) => w[0]).join('').slice(0, 2)}</span>}
+              </span>
+              <span>{r.org}{r.location && <span class="muted"> · {r.location}</span>}</span>
+            </p>
+            {r.points && r.points.length > 0 && (
+              <ul class="points">{r.points.map((p) => <li>{p}</li>)}</ul>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <aside class="side">
+      <div class="side-block sec-blue">
+        <p class="section-label">Education</p>
+        <ul class="plain edu">
+          {education.map((e) => (
+            <li>
+              <strong>{e.degree}</strong>
+              <span class="muted">{e.school}{e.year && `, ${e.year}`}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {(email || linkedin) && (
+        <div class="side-block sec-amber">
+          <p class="section-label">Contact</p>
+          {email && (
+            <a class="email" href={`mailto:${email}`}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1.75" y="3.25" width="12.5" height="9.5" rx="1.75" /><path d="M2.5 4.5 8 8.75l5.5-4.25" /></svg>
+              <span>{email}</span>
+            </a>
+          )}
+          {linkedin && (
+            <a class="social" href={linkedin} aria-label="LinkedIn profile" title="LinkedIn">
+              <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="4" fill="#0A66C2" />
+                <circle cx="7.4" cy="7.6" r="1.6" fill="#fff" />
+                <rect x="6" y="10" width="2.8" height="8" rx="0.4" fill="#fff" />
+                <path d="M11 10h2.7v1.2c.5-.8 1.5-1.5 3-1.5 2.4 0 3.3 1.5 3.3 4V18h-2.8v-3.8c0-1.2-.3-2-1.4-2-1.2 0-1.9.9-1.9 2.1V18H11z" fill="#fff" />
+              </svg>
+            </a>
+          )}
+          {linkedin && <span class="print-only">{linkedinShort}</span>}
+        </div>
+      )}
+
+      <div class="side-block sec-red">
+        <p class="section-label">Skills</p>
+        <ul class="skills">{skills.map((s) => <li>{s}</li>)}</ul>
+      </div>
+    </aside>
+  </div>
+
+  {hasPdf && (
+    <div class="pdf-cta">
+      <a class="btn" href={PDF_PATH} target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 1.5H4.5A1.5 1.5 0 0 0 3 3v10a1.5 1.5 0 0 0 1.5 1.5h7A1.5 1.5 0 0 0 13 13V5.5z" /><path d="M9 1.5v4h4" /></svg>
+        PDF Resume
+      </a>
+    </div>
+  )}
+</Base>
+
+<style>
+  /* Resume accent: teal, matching the page's pill. */
+  .page-head, .resume { --res: #2dd4bf; --res-soft: rgba(45, 212, 191, 0.12); }
+  @media (prefers-color-scheme: light) {
+    .page-head, .resume { --res: #0d9488; --res-soft: rgba(13, 148, 136, 0.1); }
+  }
+
+  .page-head { padding-top: 3.5rem; position: relative; }
+  .glow {
+    position: absolute;
+    inset: -5rem -30% auto;
+    height: 22rem;
+    background: radial-gradient(ellipse 40% 55% at 40% 30%, rgba(45, 212, 191, 0.07), transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+  .page-head h1 { margin-top: 1.25rem; }
+  .lede { font-size: 1.0625rem; max-width: 38rem; }
+  /* PDF Resume button: centred at the bottom of the page, below a divider. */
+  .pdf-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 3.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .draft-note {
+    margin-top: 1.5rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px dashed var(--border-strong);
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  /* Two columns: experience on the left, a narrower sidebar on the right with a divider between. */
+  .resume {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 13rem;
+    gap: 2.5rem;
+    margin-top: 1rem;
+  }
+  /* Column divider: a hairline that fades in and out, with a faint blue tint in the middle. */
+  .side { position: relative; padding-left: 1.75rem; }
+  .side::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in srgb, var(--accent) 35%, var(--border-strong)) 15%,
+      var(--border-strong) 55%,
+      transparent
+    );
+  }
+  .side-block + .side-block .section-label { margin-top: 2.25rem; }
+
+  /* Section labels get a short colored bar. */
+  .resume .section-label { display: flex; align-items: center; gap: 0.5rem; }
+  .resume .section-label::before {
+    content: '';
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--bar);
+  }
+  /* Each section has its own subtle color: Experience teal, Education blue, Contact amber, Skills red. */
+  .sec-teal { --sec: var(--res); }
+  .sec-amber { --sec: #f5b84a; }
+  .sec-red { --sec: #f87171; }
+  .sec-blue { --sec: #7aa7ff; }
+  @media (prefers-color-scheme: light) {
+    .sec-amber { --sec: #c27c0e; }
+    .sec-red { --sec: #dc2626; }
+    .sec-blue { --sec: #2f6fde; }
+  }
+  .resume .section-label { --bar: color-mix(in srgb, var(--sec) 70%, transparent); }
+
+  .roles { list-style: none; margin: 0; padding: 0; position: relative; }
+  /* One continuous rail: teal at the latest role, easing to blue, then fading out. */
+  .roles::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0.75rem;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      var(--res),
+      color-mix(in srgb, var(--accent) 45%, var(--border-strong)) 22%,
+      var(--border-strong) 70%,
+      transparent
+    );
+  }
+  .roles > li {
+    position: relative;
+    padding: 0 0 1.75rem 1.75rem;
+  }
+  .roles > li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.45rem;
+    width: 9px;
+    height: 9px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid color-mix(in srgb, var(--accent) 55%, var(--border-strong));
+  }
+  .roles > li.latest::before {
+    background: var(--res);
+    border-color: var(--res);
+    box-shadow: 0 0 0 4px var(--res-soft), 0 0 12px color-mix(in srgb, var(--res) 45%, transparent);
+  }
+  .roles > li + li { padding-top: 0.25rem; }
+  .roles > li:last-child { padding-bottom: 0; }
+  /* Title on top, date pill underneath: same alignment for every role. */
+  .role-head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  .role-head h3 { margin: 0; font-size: 1rem; color: var(--res); }
+  .when {
+    font-size: 0.8125rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .org {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.3rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+  }
+  /* Company icon: a small rounded tile before the name. */
+  .logo {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    /* White tiles let each logo show in its own brand colors. */
+    background: #fff;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .logo img { width: 14px; height: 14px; display: block; object-fit: contain; }
+  .logo-text { font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.02em; color: #18181b; }
+  .points { margin: 0.5rem 0 0; padding-left: 1.1rem; font-size: 0.9375rem; }
+  .points li { margin: 0.2rem 0; }
+  .points li::marker { color: var(--muted); }
+
+  .plain { list-style: none; margin: 0; padding: 0; font-size: 0.875rem; }
+  .plain li { margin: 0 0 0.5rem; overflow-wrap: anywhere; }
+  .edu li {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.9rem;
+  }
+  .edu strong { font-weight: 500; font-size: 0.875rem; display: flex; align-items: center; gap: 0.45rem; }
+  .edu strong::before {
+    content: '';
+    flex: none;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--sec) 75%, transparent);
+  }
+  .edu span { padding-left: calc(5px + 0.45rem); }
+  .edu span { font-size: 0.8125rem; line-height: 1.45; }
+
+  /* LinkedIn brand colors: blue #0A66C2 with a white "in". */
+  .social { display: inline-flex; border-radius: 6px; transition: filter 0.15s ease, transform 0.15s ease; }
+  .social:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .social:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+  .email {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .email svg { flex: none; color: var(--sec); }
+  .email:hover span { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .print-only { display: none; }
+
+  .skills { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .skills li {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    color: var(--text-secondary);
+    background: var(--surface);
+    border: 1px solid color-mix(in srgb, var(--sec) 22%, transparent);
+  }
+
+  /* Phones: one column, sidebar moves below experience. */
+  @media (max-width: 680px) {
+    .resume { grid-template-columns: 1fr; gap: 0; }
+    .side { padding-left: 0; padding-top: 0; margin-top: 2rem; }
+    .side::before {
+      top: 0; bottom: auto; right: 0;
+      width: auto; height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        color-mix(in srgb, var(--accent) 35%, var(--border-strong)) 20%,
+        var(--border-strong) 80%,
+        transparent
+      );
+    }
+  }
+
+  /* Printing (browser print): plain black on white, no site chrome, keep both columns. */
+  @media print {
+    :global(.site-header), :global(.site-footer), .pdf-cta, .draft-note, .eyebrow { display: none !important; }
+    :global(body) { background: #fff !important; color: #222 !important; font-size: 10pt; }
+    :global(main) { min-height: 0 !important; padding: 0 !important; max-width: none !important; }
+    .page-head { padding-top: 0; }
+    h1, h3 { color: #000 !important; -webkit-text-fill-color: #000; background: none !important; }
+    .org, .points, .lede, .plain, .edu strong { color: #333 !important; }
+    .when, .section-label, .muted { color: #666 !important; }
+    .resume { grid-template-columns: minmax(0, 1fr) 12rem !important; gap: 1.5rem !important; }
+    .side::before { display: none !important; }
+    .side { border-left: 1px solid #ccc !important; padding-left: 1.25rem !important; border-top: 0 !important; margin-top: 0 !important; }
+    .roles > li + li { border-top-color: #ddd; }
+    .skills li { background: none !important; border-color: #bbb !important; color: #333 !important; }
+    .glow { display: none !important; }
+    .when { background: none !important; padding: 0 !important; }
+    .org { color: #333 !important; }
+    .logo { border-color: #ccc !important; }
+    .logo-text { color: #333 !important; }
+    .roles::before { background: #ccc !important; }
+    .roles > li::before { border-color: #888 !important; background: #fff !important; box-shadow: none !important; }
+    .roles > li.latest::before { background: #888 !important; }
+    .edu li { background: none !important; border-color: #ddd !important; border-left-color: #888 !important; }
+    .resume .section-label::before { background: #888 !important; }
+    .edu strong::before { background: #888 !important; }
+    .roles > li { break-inside: avoid; }
+    a { color: #222 !important; text-decoration: none !important; }
+    .social { display: none !important; }
+    .email { color: #333 !important; }
+    .email svg { display: none; }
+    .print-only { display: block; font-size: 9pt; color: #333; }
+  }
+</style>

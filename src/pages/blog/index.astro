@@ -12,10 +12,16 @@ const fmt = (d: Date) =>
 
 <Base title="Blog" description="Writing and notes">
   <header class="page-head">
-    <span class="eyebrow"><span class="dot"></span> Blog</span>
+    <span class="eyebrow"><span class="dot dot-violet"></span> Blog</span>
     <h1 class="gradient-text">Writing</h1>
-    <p class="lede">Notes, essays, and updates on what I'm reading and working on.</p>
+    <p class="lede">Ramblings, notes, and the occasional late-night tangent.</p>
   </header>
+
+  {posts.length === 0 && (
+    <div class="card empty">
+      <p>No posts yet. The first one is on its way, so check back soon.</p>
+    </div>
+  )}
 
   <ul class="posts">
     {posts.map((post) => (
@@ -37,6 +43,9 @@ const fmt = (d: Date) =>
   .page-head { padding-top: 3.5rem; margin-bottom: 2.5rem; }
   .page-head h1 { margin-top: 1.25rem; }
   .lede { font-size: 1.125rem; }
+  .empty { text-align: center; padding: 2.5rem 1.5rem; color: var(--muted); }
+  .empty:hover { background: var(--surface); border-color: var(--border); }
+  .empty p { margin: 0; }
   .posts { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
   .post { display: block; }
   .post time { font-size: 0.8125rem; font-variant-numeric: tabular-nums; }

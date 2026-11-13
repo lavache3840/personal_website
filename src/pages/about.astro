@@ -1,35 +1,61 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import Base from '../layouts/Base.astro';
-import { SITE } from '../consts';
+import { SITE, AUTHOR } from '../consts';
+import { faqs } from '../data/faq';
+
+// Photo: put your picture at public/images/headshot.jpg and it replaces the placeholder.
+const PHOTO = '/images/headshot.jpg';
+const hasPhoto = fs.existsSync(path.join(process.cwd(), 'public', 'images', 'headshot.jpg'));
 ---
 
-<Base title="About" description={`About ${SITE.name}`}>
+<Base title="About" description={`About ${AUTHOR.name}, the person behind ${SITE.name}`}>
   <header class="page-head">
-    <span class="eyebrow"><span class="dot"></span> About</span>
+    <span class="eyebrow"><span class="dot dot-amber"></span> About</span>
     <h1 class="gradient-text">About me</h1>
   </header>
 
   <div class="intro">
-    <!-- Add a headshot at public/images/headshot.jpg and uncomment:
-    <img src="/images/headshot.jpg" alt={SITE.name} width="160" height="160" class="headshot" />
-    -->
+    {hasPhoto ? (
+      <img src={PHOTO} alt={AUTHOR.name} width="160" height="160" class="headshot" />
+    ) : (
+      <div class="headshot headshot-placeholder" role="img" aria-label="Photo placeholder">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="8.5" r="3.75" />
+          <path d="M4.5 20c.9-3.6 3.9-5.75 7.5-5.75s6.6 2.15 7.5 5.75" />
+        </svg>
+        <span>Photo</span>
+      </div>
+    )}
     <div>
       <p>
-        <strong>Placeholder bio.</strong> I'm {SITE.name}. Write two or three sentences here about who
-        you are, what you do, and where you are based or affiliated.
+        Hi, I'm <strong>{AUTHOR.name}</strong>, also known around here as the Rambling Somnambulist.
       </p>
       <p>
-        Add a paragraph on your background: education, past roles, and the path that led you to
-        your current interests.
+        <em>Placeholder:</em> write two or three sentences about who you are and what you do.
+      </p>
+      <p>
+        Add a paragraph about how you got here and what you care about.
+      </p>
+      <p class="resume-link">
+        If you would like to see my full resume, <a href="/resume/">click here</a>.
       </p>
     </div>
   </div>
 
-  <p class="section-label">Currently</p>
-  <ul class="card now">
-    <li>What you're working on now</li>
-    <li>What you're reading or learning</li>
-  </ul>
+  <p class="section-label">Frequently asked questions</p>
+  <div class="faq">
+    {faqs.map((f, i) => (
+      <details open={i === 0}>
+        <summary>
+          <span>{f.question}</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4" /></svg>
+        </summary>
+        <p set:html={f.answer} />
+      </details>
+    ))}
+  </div>
 
   <p class="section-label">Get in touch</p>
   <p>
@@ -42,11 +68,50 @@ import { SITE } from '../consts';
   .page-head { padding-top: 3.5rem; }
   .page-head h1 { margin-top: 1.25rem; }
   .intro p { font-size: 1.0625rem; }
-  .now { list-style: none; margin: 0; }
-  .now li { padding: 0.35rem 0; }
-  .now li + li { border-top: 1px solid var(--border); }
-  .headshot { border: 1px solid var(--border-strong); }
+  .headshot { width: 160px; height: 160px; flex: none; border: 1px solid var(--border-strong); }
+  .headshot-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border: 1.5px dashed color-mix(in srgb, var(--dot-amber, #f5b84a) 45%, var(--border-strong));
+    background:
+      radial-gradient(circle at 50% 35%, color-mix(in srgb, #f5b84a 10%, transparent), transparent 70%),
+      var(--surface);
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
   .intro { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-start; }
-  .intro > div { flex: 1 1 18rem; }
+  .intro > div:not(.headshot) { flex: 1 1 18rem; }
   .headshot { border-radius: 50%; object-fit: cover; }
+
+  /* FAQ: expandable rows in one bordered panel, matching the site's cards. */
+  .faq {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .faq details + details { border-top: 1px solid var(--border); }
+  .faq summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    list-style: none;
+    color: var(--text);
+    font-weight: 500;
+    transition: background 0.15s ease;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary:hover { background: var(--surface-hover); }
+  .faq summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .chevron { flex: none; color: var(--muted); transition: transform 0.2s ease; }
+  .faq details[open] .chevron { transform: rotate(180deg); }
+  .faq details p { margin: 0; padding: 0 1.25rem 1.1rem; font-size: 0.9375rem; }
 </style>
